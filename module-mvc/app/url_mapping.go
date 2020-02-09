@@ -10,9 +10,11 @@ import (
 func mapUrls() {
 	router.Use(static.Serve("/", static.LocalFile("./static", false)))
 	// api type urls
-	router.GET("/users", controllers.GetAllUserNew)
-	router.GET("/users/:limit", controllers.GetAllUserNew)
-	router.GET("/user/:user_id", controllers.GetUser)
+	api := router.Group("/api")
+	// no middleware so no use of api.Use function
+	api.GET("/users", controllers.GetAllUserNew)
+	api.GET("/users/:limit", controllers.GetAllUserNew)
+	api.GET("/user/:user_id", controllers.GetUser)
 
 	// html template output
 	router.GET("/", controllers.Index)

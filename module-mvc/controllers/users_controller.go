@@ -18,6 +18,7 @@ var wg sync.WaitGroup
 func GetUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	db := helpers.GetDB()
+	defer helpers.CloseDB(db)
 	row := db.QueryRow("SELECT id, first_name, last_name FROM `user` WHERE id = ?", id)
 	if err != nil {
 		panic(err)
@@ -45,6 +46,7 @@ func GetUser(c *gin.Context) {
 //GetAllUserNew return all user
 func GetAllUserNew(c *gin.Context) {
 	db := helpers.GetDB()
+	defer helpers.CloseDB(db)
 
 	limit, err := strconv.ParseInt(c.Param("limit"), 10, 64)
 	if err != nil {
@@ -54,7 +56,7 @@ func GetAllUserNew(c *gin.Context) {
 	//runtime.GOMAXPROCS(4)
 	ch := make(chan domain.User)
 	quit := make(chan int)
-	defer helpers.CloseDB(db)
+
 	go func(ch chan domain.User) {
 		rows, err := db.Query("SELECT id, first_name, last_name FROM `user` LIMIT 0,?", limit)
 

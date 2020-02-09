@@ -44,6 +44,7 @@ func Index(c *gin.Context) {
 //PopupDB to populate db
 func PopupDB(c *gin.Context) {
 	db := helpers.GetDB()
+	defer helpers.CloseDB(db)
 
 	stmt, err := db.Prepare("INSERT INTO `user` SET username = ?, password = ?, first_name = ?, last_name = ?")
 	if err != nil {
@@ -86,6 +87,7 @@ func LoginHandler(c *gin.Context) {
 		c.Redirect(http.StatusSeeOther, "/site/login")
 	} else {
 		db := helpers.GetDB()
+		defer helpers.CloseDB(db)
 		row := db.QueryRow("SELECT id, username, password FROM `user` WHERE `username` = ?", username)
 
 		var user domain.User
@@ -167,7 +169,7 @@ func RegisterHandler(c *gin.Context) {
 	var id int
 
 	db := helpers.GetDB()
-	defer db.Close()
+	defer helpers.CloseDB(db)
 
 	row := db.QueryRow("SELECT id FROM `user` WHERE username = ? OR email = ?", username, email)
 	err := row.Scan(&id)
