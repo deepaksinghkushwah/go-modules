@@ -1,0 +1,17 @@
+{{template "header" .}}
+
+    <form action="/site/login" method="POST">
+        <table class="table table-bordered">
+            <tr>
+                <td><input type="text" class="form-control" name="username" placeholder="Username"></td>
+            </tr>
+            <tr>
+                <td><input type="password" class="form-control" name="password" placeholder="Password"></td>
+            </tr>
+            <tr>
+                <td><button type="submit" class="btn btn-primary">Login</button></td>
+            </tr>
+        </table>
+    </form>
+
+{{template "footer"}}

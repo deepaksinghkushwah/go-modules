@@ -1,0 +1,26 @@
+{{template "header" .}}
+
+    <form action="/site/register" method="POST">
+        <table class="table table-bordered">
+            <tr>
+                <td><input type="text" class="form-control" name="email" placeholder="Email"></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control" name="username" placeholder="Username"></td>
+            </tr>
+            <tr>
+                <td><input type="password" class="form-control" name="password" placeholder="Password"></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control" name="firstname" placeholder="Frist Name"></td>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control" name="lastname" placeholder="Last Name"></td>
+            </tr>
+            <tr>
+                <td><button type="submit" class="btn btn-primary">Register</button></td>
+            </tr>
+        </table>
+    </form>    
+
+{{template "footer"}}

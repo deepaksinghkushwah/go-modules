@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"module-mvc/domain"
 	"module-mvc/helpers"
 	"strconv"
 	"sync"
@@ -12,13 +14,6 @@ import (
 
 var wg sync.WaitGroup
 
-//User struct
-type User struct {
-	UserID    int64          `json:"user_id"`
-	FirstName sql.NullString `json:"first_name"`
-	LastName  sql.NullString `json:"last_name"`
-}
-
 //GetUser return single user
 func GetUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
@@ -27,10 +22,20 @@ func GetUser(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	var user User
-	err = row.Scan(&user.UserID, &user.FirstName, &user.LastName)
+	var user domain.User
+	err = row.Scan(&user.ID, &user.FirstName, &user.LastName)
 	if err != nil {
-		panic(err)
+		if err == sql.ErrNoRows {
+			c.JSON(200, gin.H{
+				"msg": "No record found with id " + fmt.Sprintf("%d", id),
+			})
+			return
+		} else {
+			c.JSON(200, gin.H{
+				"msg": err.Error(),
+			})
+			return
+		}
 	}
 
 	c.JSON(200, user)
@@ -45,20 +50,20 @@ func GetAllUserNew(c *gin.Context) {
 	if err != nil {
 		limit = 100
 	}
-	users := []User{}
+	users := []domain.User{}
 	//runtime.GOMAXPROCS(4)
-	ch := make(chan User)
+	ch := make(chan domain.User)
 	quit := make(chan int)
 	defer helpers.CloseDB(db)
-	go func(ch chan User) {
+	go func(ch chan domain.User) {
 		rows, err := db.Query("SELECT id, first_name, last_name FROM `user` LIMIT 0,?", limit)
 
 		if err != nil {
 			panic(err)
 		}
 		for rows.Next() {
-			var tUser User
-			err = rows.Scan(&tUser.UserID, &tUser.FirstName, &tUser.LastName)
+			var tUser domain.User
+			err = rows.Scan(&tUser.ID, &tUser.FirstName, &tUser.LastName)
 			if err != nil {
 				log.Fatal(err)
 			} else {
