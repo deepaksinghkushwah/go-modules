@@ -9,16 +9,16 @@ import (
 
 func mapUrls() {
 	router.Use(static.Serve("/", static.LocalFile("./static", false)))
-	// api type urls
+
+	// api urls
 	api := router.Group("/api")
 	api.Use(helpers.Authorized)
 	{
-		api.GET("/users", controllers.GetAllUserNew)
+		api.GET("/users", controllers.GetAllUsers) // http://localhost:8082/api/users with params
 		api.GET("/user", controllers.GetUser)
-		api.POST("/logout", controllers.Logout) // http://localhost:8081/site/logout
 	}
 
-	router.POST("/login", controllers.LoginHandler)       // http://localhost:8081/site/login?username=test3&password=123456
-	router.POST("/register", controllers.RegisterHandler) //
+	router.POST("/login", controllers.LoginHandler)       // http://localhost:8082/login with params
+	router.POST("/register", controllers.RegisterHandler) // http://localhost:8082/register with params
 
 }

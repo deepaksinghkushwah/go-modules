@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 )
@@ -43,8 +42,8 @@ func GetUser(c *gin.Context) {
 
 }
 
-//GetAllUserNew return all user
-func GetAllUserNew(c *gin.Context) {
+//GetAllUsers return all user
+func GetAllUsers(c *gin.Context) {
 	db := helpers.GetDB()
 	defer helpers.CloseDB(db)
 
@@ -147,31 +146,8 @@ func LoginHandler(c *gin.Context) {
 	return
 }
 
-//Logout to handle logout request
-func Logout(c *gin.Context) {
-
-	session := sessions.Default(c)
-	user := session.Get(userkey)
-
-	if user == nil {
-		session.AddFlash("Invalid session token")
-		session.Save()
-		c.Redirect(http.StatusSeeOther, "/site/index")
-	}
-
-	session.Delete(userkey)
-	session.Delete(loggedInKey)
-
-	if err := session.Save(); err != nil {
-		session.AddFlash("Error at saving session")
-		session.Save()
-		c.Redirect(http.StatusSeeOther, "/site/index")
-	}
-	session.AddFlash("Logged out successfully")
-	session.Save()
-	c.Redirect(http.StatusSeeOther, "/site/login")
-
-}
+// there is no need for logout handler at backend because we are using localStorage at frontend vue app
+// so we can comment or ignore this function, it was created because we were
 
 //RegisterHandler handle register request
 func RegisterHandler(c *gin.Context) {
