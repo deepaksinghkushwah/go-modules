@@ -65,6 +65,15 @@
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/vue.min.js"></script>
+    <script>
+        let vm = new Vue({
+            el: '#example',
+            delimiters: ['${', '}'],
+            data: {
+                message: "hi there :)"
+            }
+        });
+    </script>
 </body>
 
 </html>
