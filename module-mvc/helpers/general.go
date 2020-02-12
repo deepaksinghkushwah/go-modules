@@ -8,6 +8,10 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+
+	// below package is for mysql integration
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )

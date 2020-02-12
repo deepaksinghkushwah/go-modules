@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/joho/godotenv"
 )
 
@@ -46,19 +46,43 @@ func PopupDB(c *gin.Context) {
 	db := helpers.GetDB()
 	defer helpers.CloseDB(db)
 
-	stmt, err := db.Prepare("INSERT INTO `user` SET username = ?, password = ?, first_name = ?, last_name = ?")
-	if err != nil {
-		panic(err)
-	}
-	defer stmt.Close()
+	ch := make(chan string)
+	quit := make(chan int)
+	msgs := []string{}
 
-	for i := 0; i < 50000; i++ {
-		stri := strconv.Itoa(i)
-		_, err = stmt.Exec("test"+stri, "123456", "test", stri)
+	go func(ch chan string) {
+		stmt, err := db.Prepare("INSERT INTO `user` SET email = ?, username = ?, password = ?, first_name = ?, last_name = ?")
 		if err != nil {
 			panic(err)
 		}
+		defer stmt.Close()
+		for i := 8000; i < 50000; i++ {
+
+			stri := strconv.Itoa(i)
+
+			pass, _ := helpers.HashPassword("123456")
+			_, err = stmt.Exec("test"+stri+"@localhost.com", "test"+stri, pass, "test", stri)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			ch <- "User entered: " + "test" + stri
+
+		}
+		quit <- 1
+	}(ch)
+	for {
+		select {
+		case msg, ok := <-ch:
+			if ok {
+				msgs = append(msgs, msg)
+
+			}
+		case <-quit:
+			c.JSON(200, msgs)
+			return
+		}
 	}
+
 }
 
 // LoginForm display login form
@@ -168,31 +192,37 @@ func RegisterHandler(c *gin.Context) {
 	lastName := c.PostForm("lastname")
 	var id int
 
-	db := helpers.GetDB()
-	defer helpers.CloseDB(db)
-
-	row := db.QueryRow("SELECT id FROM `user` WHERE username = ? OR email = ?", username, email)
-	err := row.Scan(&id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			hasPassword, _ := helpers.HashPassword(password)
-			_, err = db.Exec("INSERT INTO `user` SET `username` = ?, password = ?, email = ?, first_name = ?, last_name =?", username, hasPassword, email, firstName, lastName)
-
-			session.AddFlash("Registered Successfully")
-			session.Save()
-			c.Redirect(http.StatusSeeOther, "/site/login")
-		} else {
-			session.AddFlash(err.Error())
-			session.Save()
-			c.Redirect(http.StatusSeeOther, "/site/register")
-		}
-
-	} else {
-
-		session.AddFlash("Username or email already exists")
+	if username == "" || password == "" || email == "" || firstName == "" || lastName == "" {
+		session.AddFlash("All fields are required")
 		session.Save()
 		c.Redirect(http.StatusSeeOther, "/site/register")
+	} else {
+		db := helpers.GetDB()
+		defer helpers.CloseDB(db)
 
+		row := db.QueryRow("SELECT id FROM `user` WHERE username = ? OR email = ?", username, email)
+		err := row.Scan(&id)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				hasPassword, _ := helpers.HashPassword(password)
+				_, err = db.Exec("INSERT INTO `user` SET `username` = ?, password = ?, email = ?, first_name = ?, last_name =?", username, hasPassword, email, firstName, lastName)
+
+				session.AddFlash("Registered Successfully")
+				session.Save()
+				c.Redirect(http.StatusSeeOther, "/site/login")
+			} else {
+				session.AddFlash(err.Error())
+				session.Save()
+				c.Redirect(http.StatusSeeOther, "/site/register")
+			}
+
+		} else {
+
+			session.AddFlash("Username or email already exists")
+			session.Save()
+			c.Redirect(http.StatusSeeOther, "/site/register")
+
+		}
 	}
 
 }

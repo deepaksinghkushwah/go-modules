@@ -31,12 +31,12 @@ func GetUser(c *gin.Context) {
 				"msg": "No record found with id " + fmt.Sprintf("%d", id),
 			})
 			return
-		} else {
-			c.JSON(200, gin.H{
-				"msg": err.Error(),
-			})
-			return
 		}
+		c.JSON(200, gin.H{
+			"msg": err.Error(),
+		})
+		return
+
 	}
 
 	c.JSON(200, user)
