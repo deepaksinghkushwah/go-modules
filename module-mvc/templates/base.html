@@ -8,6 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ block "title" .}}{{.PageTitle}}{{ end }}</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
 </head>
 
 <body>
@@ -30,7 +31,7 @@
                     <a class="nav-link" href="/site/register">Register</a>
                 </li>
                 {{ end }}
-                
+
                 {{ if .IsLoggedIn }}
                 <li class="nav-item">
                     <a class="nav-link" href="/member/me">Me</a>
@@ -43,16 +44,16 @@
         </div>
     </nav>
 
-    <div class="container">        
+    <div class="container">
         {{range .flashes}}
-        <div class="alert alert-warning">            
+        <div class="alert alert-warning">
             <div>
                 {{.}}
-            </div>            
+            </div>
         </div>
         {{ end }}
 
-        
+
 
 
         {{ end }}
@@ -62,18 +63,18 @@
 
         {{ define  "footer" }}
     </div>
+    <footer class="footer">
+        
+        2020 &copy; Golang Proejct All rights reserved
+    </footer>
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/vue.min.js"></script>
-    <script>
-        let vm = new Vue({
-            el: '#example',
-            delimiters: ['${', '}'],
-            data: {
-                message: "hi there :)"
-            }
-        });
-    </script>
+
+
+    {{ block "footerJs" . }}
+    <!-- Default -->
+    Here goes all templates
+    {{ end }}
 </body>
 
 </html>
