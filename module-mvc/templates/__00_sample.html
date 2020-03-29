@@ -10,16 +10,15 @@
 </head>
 
 <body>
-{{ template "header" .}}
-<div class="container">
+    {{ template "header" .}}
+    <div class="container">
 
-    {{ template "flash" .}}
-    <!-- Write your code here start  -->
-    This is private page<br>
-   logged in: <b>{{ .IsLoggedIn }}</b>
-    <!-- Write your code here end -->
-</div>
-{{ template "footer" .}}
+        {{ template "flash" .}}
+        <!-- Write your code here start  -->
+
+        <!-- Write your code here end -->
+    </div>
+    {{ template "footer" .}}
 
 </body>
 </html>
