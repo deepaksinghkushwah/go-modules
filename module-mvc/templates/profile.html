@@ -16,10 +16,29 @@
     {{ template "flash" .}}
     <!-- Write your code here start  -->
     This is private page<br>
-   logged in: <b>{{ .IsLoggedIn }}</b>
+   logged in: <b>{{ .IsLoggedIn }}</b><br>
+   Current Path: {{ .currentPath }}<br>
+   <div id="example">
+       ${ message }
+       <button @click="callSampleFunc" class="btn btn-success">Click Me</button>
+   </div>
     <!-- Write your code here end -->
 </div>
 {{ template "footer" .}}
-
+<script src="/js/vue.min.js"></script>
+<script>
+    let vm = new Vue({
+        el: '#example',
+        delimiters: ['${', '}'],
+        data: {
+            message: "hi there :)"
+        },
+        methods: {
+            callSampleFunc(){
+                alert("Hello From button");
+            }
+        }
+    });
+</script>
 </body>
 </html>
