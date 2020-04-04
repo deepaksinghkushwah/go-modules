@@ -19,8 +19,27 @@
    logged in: <b>{{ .IsLoggedIn }}</b><br>
    Current Path: {{ .currentPath }}<br>
    <div id="example">
-       ${ message }
-       <button @click="callSampleFunc" class="btn btn-success">Click Me</button>
+       <table class="table table-bordered">
+           <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                </tr>            
+           </thead>
+           <tr v-for="item in rows">
+               <td><input v-model="item.name" type="text" name="" id=""></td>
+               <td><input v-model="item.age" type="text" name="" id=""></td>
+               <td>
+                   <select v-model="item.gender">
+                       <option>Male</option>
+                       <option>Female</option>
+                   </select>
+               </td>
+           </tr>
+       </table>       
+       <button @click="callSampleFunc" class="btn btn-success">Add Row</button>
+       <button @click="saveRow" class="btn btn-success">Save Rows</button>
    </div>
     <!-- Write your code here end -->
 </div>
@@ -31,11 +50,20 @@
         el: '#example',
         delimiters: ['${', '}'],
         data: {
-            message: "hi there :)"
+            message: "hi there :)",
+            rows: [
+                {name: "", age: "", gender: ""},
+            ]
         },
         methods: {
             callSampleFunc(){
-                alert("Hello From button");
+                var item = {name: "", age: "", gender: ""};
+                this.rows.push(item);
+            },
+            saveRow(){
+                var str = JSON.stringify(this.rows)
+                console.log(str);
+                alert(str);
             }
         }
     });
