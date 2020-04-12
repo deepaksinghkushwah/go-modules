@@ -24,7 +24,7 @@ func main() {
 	db.AutoMigrate(&Product{})
 
 	// create
-	//db.Create(&Product{Code: "L121213", Price: 1000})
+	db.Create(&Product{Code: "L121213", Price: 2000})
 
 	// read
 	product := Product{}
