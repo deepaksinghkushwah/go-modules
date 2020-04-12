@@ -57,6 +57,10 @@
         },
         methods: {
             callSampleFunc(){
+                if(this.rows.length >=5){
+                    alert("You can not add more rows")
+                    return false;
+                }
                 var item = {name: "", age: "", gender: ""};
                 this.rows.push(item);
             },
