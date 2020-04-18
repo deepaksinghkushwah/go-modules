@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
-
+	
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
@@ -22,14 +22,19 @@ func main() {
 	} 
 
 	split := strings.Split(string(dat), "\n")
-	counts := 2
+	counts := 2	
 	for _, item := range split {
 		if len(item) > 0 {
 			nextsplit := strings.Split(item, "Pindi: ")
 			if len(nextsplit) > 1 {
-				mainNumberSplit := strings.Split(nextsplit[1], "+")
-				number, _ := strconv.Atoi(mainNumberSplit[0])
-				amount, _ := strconv.Atoi(mainNumberSplit[1])
+				mainNumberSplit := strings.Split(nextsplit[1], "+")				
+				number, err := strconv.Atoi(mainNumberSplit[0])
+				checkError(err)
+				amount, err := strconv.Atoi(strings.Split(mainNumberSplit[1],"\r")[0]) 
+				checkError(err)
+				
+				//fmt.Printf("%d of type %T", amount, amount)
+				//fmt.Println("")
 
 				f.SetCellValue("Sheet1", "A"+strconv.Itoa(counts), counts-1)
 				f.SetCellValue("Sheet1", "B"+strconv.Itoa(counts), 31045)
@@ -41,6 +46,13 @@ func main() {
 	}
 
 	if err = f.SaveAs("Book1.xlsx"); err != nil {
+		log.Fatalln(err)
+	}
+	//fmt.Scanln("Press enter to exit")
+}
+
+func checkError(err error){
+	if err != nil {
 		log.Fatalln(err)
 	}
 }
