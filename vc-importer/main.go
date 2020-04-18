@@ -19,7 +19,7 @@ func main() {
 	dat, err := ioutil.ReadFile("./number.txt")
 	if err != nil {
 		log.Fatalln(err)
-	}
+	} 
 
 	split := strings.Split(string(dat), "\n")
 	counts := 2
