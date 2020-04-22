@@ -5,17 +5,20 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	//_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // Product struct
 type Product struct {
 	gorm.Model
-	Code  string
-	Price uint
+	Code   string
+	Price  uint
+	Status uint
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:deepak@/test?parseTime=true")
+	db, err := gorm.Open("mysql", "root:Deepak123@@/test?charset=utf8&parseTime=true&loc=Local") // for mysql
+	//db, err := gorm.Open("sqlite3", "./test.db") // for sqlite
 	checkError(err)
 
 	defer db.Close()
@@ -24,7 +27,7 @@ func main() {
 	db.AutoMigrate(&Product{})
 
 	// create
-	db.Create(&Product{Code: "L121213", Price: 2000})
+	db.Create(&Product{Code: "L121213", Price: 2000, Status: 1})
 
 	// read
 	product := Product{}
