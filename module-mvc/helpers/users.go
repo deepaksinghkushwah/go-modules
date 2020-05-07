@@ -28,7 +28,7 @@ func DeleteOldProfileImage(userID int) {
 	if user.Image.String != "noimg.png" {
 		err := os.Remove("static/images/" + user.Image.String)
 		if err != nil {
-			log.Fatalln(err)			
+			log.Println(err)			
 		}		
 	}	
 }
