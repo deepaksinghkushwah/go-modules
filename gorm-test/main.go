@@ -17,7 +17,7 @@ type Product struct {
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:Deepak123@@/test?charset=utf8&parseTime=true&loc=Local") // for mysql
+	db, err := gorm.Open("mysql", "root:deepak@/test?charset=utf8&parseTime=true&loc=Local") // for mysql
 	//db, err := gorm.Open("sqlite3", "./test.db") // for sqlite
 	checkError(err)
 
