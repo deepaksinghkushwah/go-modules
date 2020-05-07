@@ -1,2 +1,5 @@
 static/images/*
 !static/images/noimg.png
+
+.idea
+.vscode
