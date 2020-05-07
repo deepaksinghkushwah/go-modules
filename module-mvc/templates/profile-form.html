@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+
+<body>
+{{ template "header" .}}
+<div class="container">
+
+    {{ template "flash" .}}
+    <!-- Write your code here start  -->
+    <h1>Update Your Profile</h1>
+    <form action="/member/update-profile" method="post" enctype="multipart/form-data">
+        <table class="table table-bordered">
+            <tr>
+                <td>First Name</td>
+                <td><input type="text" required name="firstname" value="{{ .user.FirstName }}"></td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td><input type="text" required name="lastname" value="{{ .user.LastName }}"></td>
+            </tr>
+            <tr>
+                <td>Image</td>
+                <td>
+                    
+                    <input type="file" name="image">
+                    {{ if .user.Image.Valid }}
+                    <br><br>
+                    <img src="/images/{{ .user.Image.String }}" width="100"/>
+                    {{ end }}
+                    
+                
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td><input type="submit" class="btn btn-primary" name="saevProfile" value="Update Profile"></td>
+            </tr>
+        </table>
+    </form>
+   
+    <!-- Write your code here end -->
+</div>
+{{ template "footer" .}}
+
+</body>
+</html>

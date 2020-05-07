@@ -38,6 +38,8 @@ func mapUrls() {
 	authorized.Use(helpers.Authorized)
 	{
 		authorized.GET("/me", controllers.Me) // http://localhost:8081/member/me
+		authorized.GET("/update-profile", controllers.UpdateProfile)
+		authorized.POST("/update-profile", controllers.UpdateProfileHandler)
 	}
 
 	/**

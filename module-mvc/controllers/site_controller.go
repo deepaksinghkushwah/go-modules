@@ -123,6 +123,7 @@ func LoginHandler(c *gin.Context) {
 		} else {
 			if helpers.CheckPasswordHash(password, user.Password) {
 				session.Set(userkey, username)
+				session.Set("userID", user.ID)
 				session.Set(loggedInKey, true)
 				if err := session.Save(); err != nil {
 					session.AddFlash("Unauthorized Access")
