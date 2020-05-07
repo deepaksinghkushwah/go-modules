@@ -3,3 +3,5 @@ static/images/*
 
 .idea
 .vscode
+module-mvc
+*.exe
