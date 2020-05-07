@@ -80,16 +80,24 @@ func UpdateProfileHandler(c *gin.Context) {
 	var filename string
 	if err != nil {
 		filename = helpers.GetUserDetail(userID).Image.String
-
 	} else {
-		uuid := uuid.NewV4()
-		filename = uuid.String() + filepath.Base(file.Filename)
-		if err := c.SaveUploadedFile(file, "static/images/"+filename); err != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
-			return
+		fmt.Println("--------------------------------")
+		fmt.Println(file.Header.Get("Content-Type"))
+		fmt.Println("--------------------------------")
+		isFileOk := ValidateImageFile(file.Header.Get("Content-Type"))
+		if isFileOk == true {
+			uuid := uuid.NewV4()
+			filename = uuid.String() + filepath.Base(file.Filename)
+			if err := c.SaveUploadedFile(file, "static/images/"+filename); err != nil {
+				c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+				return
+			}
+			helpers.DeleteOldProfileImage(userID)
+		} else {
+			session.AddFlash("Image file is not valid filetype")
+			session.Save()
+			filename = helpers.GetUserDetail(userID).Image.String
 		}
-		helpers.DeleteOldProfileImage(userID)
-
 	}
 	sql += ", image = ? WHERE id = ?"
 
@@ -102,5 +110,25 @@ func UpdateProfileHandler(c *gin.Context) {
 	session.Save()
 
 	c.Redirect(http.StatusSeeOther, "/member/update-profile")
+
+}
+
+//ValidateImageFile check if fileis valid
+func ValidateImageFile(fileType string) bool {
+	var returnVal bool
+	switch fileType {
+	case "image/jpeg":
+		returnVal = true
+	case "image/jpg":
+		returnVal = true
+	case "image/png":
+		returnVal = true
+	case "image/gif":
+		returnVal = true
+	default:
+		returnVal = false
+	}
+
+	return returnVal
 
 }
