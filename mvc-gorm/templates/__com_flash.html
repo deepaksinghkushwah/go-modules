@@ -1,0 +1,9 @@
+{{ define "flash" }}
+{{range .flashes}}
+    <div class="alert alert-warning">
+        <div>
+            {{.}}
+        </div>
+    </div>
+{{ end }}
+{{ end }}

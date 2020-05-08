@@ -1,0 +1,7 @@
+static/images/*
+!static/images/noimg.png
+
+.idea
+.vscode
+module-mvc
+*.exe

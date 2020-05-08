@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+
+<body>
+{{ template "header" .}}
+<div class="container">
+
+    {{ template "flash" .}}
+    <!-- Write your code here start  -->
+    This is private page<br>
+   logged in: <b>{{ .IsLoggedIn }}</b><br>
+   Current Path: {{ .currentPath }}<br>
+   <div id="example">
+       <table class="table table-bordered">
+           <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                </tr>            
+           </thead>
+           <tr v-for="item in rows">
+               <td><input v-model="item.name" type="text" name="" id=""></td>
+               <td><input v-model="item.age" type="text" name="" id=""></td>
+               <td>
+                   <select v-model="item.gender">
+                       <option>Male</option>
+                       <option>Female</option>
+                   </select>
+               </td>
+           </tr>
+       </table>       
+       <button @click="callSampleFunc" class="btn btn-success">Add Row</button>
+       <button @click="saveRow" class="btn btn-success">Save Rows</button>
+   </div>
+    <!-- Write your code here end -->
+</div>
+{{ template "footer" .}}
+<script src="/js/vue.min.js"></script>
+<script>
+    let vm = new Vue({
+        el: '#example',
+        delimiters: ['${', '}'],
+        data: {
+            message: "hi there :)",
+            rows: [
+                {name: "", age: "", gender: ""},
+            ]
+        },
+        methods: {
+            callSampleFunc(){
+                if(this.rows.length >=5){
+                    alert("You can not add more rows")
+                    return false;
+                }
+                var item = {name: "", age: "", gender: ""};
+                this.rows.push(item);
+            },
+            saveRow(){
+                var str = JSON.stringify(this.rows)
+                console.log(str);
+                alert(str);
+            }
+        }
+    });
+</script>
+</body>
+</html>
