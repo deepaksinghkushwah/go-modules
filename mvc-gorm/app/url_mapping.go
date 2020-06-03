@@ -1,6 +1,7 @@
 package app
 
 import (
+	"mvc-gorm/admincontrollers"
 	"mvc-gorm/controllers"
 	"mvc-gorm/helpers/general"
 
@@ -37,6 +38,16 @@ func mapUrls() {
 		authorized.GET("/me", controllers.Me) // http://localhost:8081/member/me
 		authorized.GET("/update-profile", controllers.UpdateProfile)
 		authorized.POST("/update-profile", controllers.UpdateProfileHandler)
+	}
+
+	admin := router.Group("/admin") // /member is prefix which will added on each route who is member of this route group
+	admin.Use(general.AuthAdmin)
+	{
+		admin.GET("/dashboard", admincontrollers.Dashboard)
+		blog := admin.Group("/blog")
+		blog.GET("/list", admincontrollers.BlogList)
+		blog.GET("/create", admincontrollers.BlogList)
+
 	}
 
 	/**

@@ -3,5 +3,5 @@ static/images/*
 
 .idea
 .vscode
-module-mvc
+mvc-gorm
 *.exe

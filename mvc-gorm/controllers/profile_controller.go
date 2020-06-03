@@ -26,6 +26,7 @@ func Me(c *gin.Context) {
 		"IsLoggedIn":  session.Get(loggedInKey),
 		"flashes":     flash,
 		"currentPath": currentPath,
+		"roleID":      session.Get("roleID"),
 	})
 
 }
@@ -56,6 +57,7 @@ func UpdateProfile(c *gin.Context) {
 		"flashes":     flash,
 		"currentPath": currentPath,
 		"user":        user,
+		"roleID":      session.Get("roleID"),
 	})
 }
 
@@ -81,9 +83,9 @@ func UpdateProfileHandler(c *gin.Context) {
 	if err != nil {
 		filename = users.GetUserDetail(userID).Image.String
 	} else {
-		fmt.Println("--------------------------------")
-		fmt.Println(file.Header.Get("Content-Type"))
-		fmt.Println("--------------------------------")
+		//fmt.Println("--------------------------------")
+		//fmt.Println(file.Header.Get("Content-Type"))
+		//fmt.Println("--------------------------------")
 		isFileOk := ValidateImageFile(file.Header.Get("Content-Type"))
 		if isFileOk == true {
 			uuid := uuid.NewV4()

@@ -16,4 +16,6 @@ type User struct {
 	FirstName string
 	LastName  string
 	Image     sql.NullString
+	RoleID    uint `gorm:"default:'2'"`
+	Role      Role `gorm:"foreignkey:fkUserRole"`
 }

@@ -31,11 +31,15 @@ func Index(c *gin.Context) {
 	session := sessions.Default(c)
 	flash := session.Flashes()
 	session.Save()
+	var roleID uint
+	roleID = session.Get("roleID").(uint)
+
 	c.HTML(200, "index.html", gin.H{
 		"Title":      "Index Page",
 		"Content":    "This is sample content",
 		"IsLoggedIn": session.Get(loggedInKey),
 		"flashes":    flash,
+		"roleID":     roleID,
 	})
 
 }
@@ -50,6 +54,7 @@ func LoginForm(c *gin.Context) {
 		"Content":    nil,
 		"IsLoggedIn": session.Get(loggedInKey),
 		"flashes":    flash,
+		"roleID":     session.Get("roleID"),
 	})
 
 }
@@ -69,7 +74,9 @@ func LoginHandler(c *gin.Context) {
 		defer general.CloseDB(db)
 		user := models.User{}
 		db.Where("username = ?", username).First(&user)
-
+		//fmt.Println("--------------------------")
+		//log.Println(user.RoleID)
+		//fmt.Println("--------------------------")
 		if user.ID <= 0 {
 			session.AddFlash("User not found")
 			session.Save()
@@ -79,6 +86,7 @@ func LoginHandler(c *gin.Context) {
 				session.Set(userkey, username)
 				session.Set("userID", user.ID)
 				session.Set(loggedInKey, true)
+				session.Set("roleID", uint(user.RoleID))
 				if err := session.Save(); err != nil {
 					session.AddFlash("Unauthorized Access")
 					session.Save()
@@ -134,6 +142,7 @@ func RegisterForm(c *gin.Context) {
 		"Content":    "Register Here",
 		"IsLoggedIn": session.Get(loggedInKey),
 		"flashes":    flash,
+		"roleID":     session.Get("roleID"),
 	})
 }
 
@@ -166,6 +175,7 @@ func RegisterHandler(c *gin.Context) {
 				Email:     email,
 				FirstName: firstName,
 				LastName:  lastName,
+				RoleID:    2,
 			})
 			session.AddFlash("Registered Successfully")
 			session.Save()

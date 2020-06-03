@@ -56,6 +56,19 @@ func Authorized(c *gin.Context) {
 	c.Next()
 }
 
+//AuthAdmin authorized admin user
+func AuthAdmin(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(userkey)
+	roleID := session.Get("roleID").(uint)
+	if user == nil || roleID != 1 {
+		session.AddFlash("Unauthorized Access")
+		session.Save()
+		c.Redirect(http.StatusSeeOther, "/")
+	}
+	c.Next()
+}
+
 //HashPassword generate hash password
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -71,5 +84,23 @@ func CheckPasswordHash(password, hash string) bool {
 func checkError(err error) {
 	if err != nil {
 		log.Fatalln(err)
+	}
+}
+
+//RunMigration will run first migrations
+func RunMigration() {
+	db := GetDB()
+
+	db.AutoMigrate(&models.Role{})
+	db.AutoMigrate(&models.User{})
+
+	var role models.Role
+	db.First(&role)
+	if role.ID <= 0 {
+		role1 := models.Role{Title: "Admin"}
+		db.Create(&role1)
+
+		role2 := models.Role{Title: "Registered"}
+		db.Create(&role2)
 	}
 }
