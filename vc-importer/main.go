@@ -11,15 +11,16 @@ import (
 
 func main() {
 	f := excelize.NewFile()
+	f.SetColWidth("Sheet1", "A","H", 20)
+	
+
 	f.SetCellValue("Sheet1", "A1", "Srno")
 	f.SetCellValue("Sheet1", "B1", "LcoID")
 	f.SetCellValue("Sheet1", "C1", "Vcno")
 	f.SetCellValue("Sheet1", "D1", "Recharge_Amount")
 
 	dat, err := ioutil.ReadFile("./number.txt")
-	if err != nil {
-		log.Fatalln(err)
-	} 
+	checkError(err)
 
 	split := strings.Split(string(dat), "\n")
 	counts := 2	
@@ -46,7 +47,7 @@ func main() {
 	}
 
 	if err = f.SaveAs("Book1.xlsx"); err != nil {
-		log.Fatalln(err)
+		checkError(err)
 	}
 	//fmt.Scanln("Press enter to exit")
 }
