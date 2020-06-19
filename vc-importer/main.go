@@ -18,7 +18,6 @@ func main() {
 	f.SetCellValue("Sheet1", "C1", "Vcno")
 	f.SetCellValue("Sheet1", "D1", "Recharge_Amount")
 
-	// read number.txt file
 	dat, err := ioutil.ReadFile("./number.txt")
 	checkError(err)
 
