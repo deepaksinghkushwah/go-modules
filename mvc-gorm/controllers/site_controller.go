@@ -32,7 +32,11 @@ func Index(c *gin.Context) {
 	flash := session.Flashes()
 	session.Save()
 	var roleID uint
-	roleID = session.Get("roleID").(uint)
+	if session.Get("roleID") != nil {
+		roleID = session.Get("roleID").(uint)
+	} else {
+		roleID = 0
+	}
 
 	c.HTML(200, "index.html", gin.H{
 		"Title":      "Index Page",
