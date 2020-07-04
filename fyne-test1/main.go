@@ -14,14 +14,9 @@ func main() {
 
 	tabs := widget.NewTabContainer(
 		widget.NewTabItem("Tab 1", widget.NewLabel("Hello")),
-<<<<<<< HEAD
-		widget.NewTabItem("Tab 2", widget.NewLabel("World!")),
-	)
-=======
 		widget.NewTabItem("Tab 2", widget.NewButton("World!", func() {
 			go showAnother(myApp)
 		})))
->>>>>>> 43219543ccc1cfbd89837cf07485a3acd451bdef
 
 	//widget.NewTabItemWithIcon("Home", theme.HomeIcon(), widget.NewLabel("Home tab"))
 
