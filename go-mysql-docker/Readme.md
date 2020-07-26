@@ -1,1 +1,1 @@
-This is simple docker-compose file to create mysql 5.7 server for golang projects.
+This folder is for docker-compose file to create mysql 5.7 server for golang projects. I use this to create mysql instance and use it for golang project/tests.
