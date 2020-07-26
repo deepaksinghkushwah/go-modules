@@ -102,5 +102,8 @@ func RunMigration() {
 
 		role2 := models.Role{Title: "Registered"}
 		db.Create(&role2)
+		hashPassword, _ := HashPassword("123456")
+		admin := models.User{Email: "admin@localhost.com", Username: "admin", Password: hashPassword, FirstName: "Super", LastName: "Admin", RoleID: 1}
+		db.Create(&admin)
 	}
 }
