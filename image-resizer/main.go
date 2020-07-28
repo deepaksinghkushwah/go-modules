@@ -26,13 +26,16 @@ func main() {
 	checkErr(err)
 
 	for _, f := range files {
-		fmt.Println("Processing: " + ex + `/images/` + f.Name())
-		src, err := imaging.Open(ex + `/images/` + f.Name())
-		checkErr(err)
-		//imaging.Fit(src, 800, 600, imaging.Lanczos)
-		destImg := imaging.Fill(src, *width, *height, imaging.Center, imaging.Lanczos)
-		err = imaging.Save(destImg, ex+`/images/resized-`+f.Name())
-		checkErr(err)
+		if f.Name() != ".gitkeep" {
+			fmt.Println("Processing: " + ex + `/images/` + f.Name())
+			src, err := imaging.Open(ex + `/images/` + f.Name())
+			checkErr(err)
+			//imaging.Fit(src, 800, 600, imaging.Lanczos)
+			destImg := imaging.Fill(src, *width, *height, imaging.Center, imaging.Lanczos)
+			err = imaging.Save(destImg, ex+`/images/resized-`+f.Name())
+			checkErr(err)
+		}
+
 	}
 }
 
