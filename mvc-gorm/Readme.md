@@ -2,12 +2,12 @@ First setup your database server, I have used mysql. You can choose any other an
 
 User Roles
 -----------
-Admin
-Registered
+Admin<br>
+Registered<br>
 
 Users
 -------
-Admin user: admin
-Password: 123456
+Admin user: admin<br>
+Password: 123456<br>
 
 Now if you register new user, it will be registered with "Registered" user role.
