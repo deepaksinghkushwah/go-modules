@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
+
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
+	"fyne.io/fyne/dialog"
 
 	//"fyne.io/fyne/theme"
+
 	"fyne.io/fyne/widget"
 )
 
@@ -28,8 +32,19 @@ func main() {
 }
 
 func showAnother(a fyne.App) {
+
 	win := a.NewWindow("My Another Window")
+
+	dialog.ShowConfirm("Hello", "This is sample message", callback, win)
 	win.SetContent(widget.NewLabel("This is second window"))
 	win.Resize(fyne.NewSize(800, 600))
 	win.Show()
+}
+
+func callback(s bool) {
+	if s == true {
+		fmt.Println("You clock on yes")
+	} else {
+		fmt.Println("You clock on no")
+	}
 }
