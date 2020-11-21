@@ -5,8 +5,6 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	//_ "github.com/jinzhu/gorm/dialects/mysql"
-	//_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // Product struct
