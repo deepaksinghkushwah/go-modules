@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	//_ "github.com/jinzhu/gorm/dialects/mysql"
 	//_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
@@ -17,11 +18,9 @@ type Product struct {
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:deepak@/test?charset=utf8&parseTime=true&loc=Local") // for mysql
-	//db, err := gorm.Open("sqlite3", "./test.db") // for sqlite
+	//db, err := gorm.Open("mysql", "root:deepak@/test?charset=utf8&parseTime=true&loc=Local") // for mysql
+	db, err := gorm.Open(sqlite.Open("./test.db"), &gorm.Config{}) // for sqlite
 	checkError(err)
-
-	defer db.Close()
 
 	// AutoMigrate run auto migration for given models, will only add missing fields, won't delete/change current data
 	db.AutoMigrate(&Product{})
