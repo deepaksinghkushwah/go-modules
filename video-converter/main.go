@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/gammazero/workerpool"
 )
@@ -42,13 +44,29 @@ func main() {
 		source := file
 		dest := strings.TrimSuffix(source, filepath.Ext(source)) + "-out.mp4"
 		cmd := newCmd(source, dest)
-		fmt.Println(cmd.String())
-		wp.Submit(func() {
-			if err := cmd.Run(); err != nil {
-				log.Fatalln(err)
-			}
-		})
+		var stdout, stderr []byte
 
+		stdoutIn, _ := cmd.StdoutPipe()
+		stderrIn, _ := cmd.StderrPipe()
+
+		//fmt.Println(cmd.String())
+		wp.Submit(func() {
+			cmd.Start()
+			var wg sync.WaitGroup
+			wg.Add(1)
+			var errStdout, errStderr error
+			go func(errStdout error, errStderr error) {
+				stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
+				wg.Done()
+			}(errStdout, errStderr)
+			stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
+
+			wg.Wait()
+
+			cmd.Wait()
+			outStr, errStr := string(stdout), string(stderr)
+			fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
+		})
 	}
 	wp.StopWait()
 }
@@ -63,4 +81,27 @@ func newCmd(mainFile, outputFile string) *exec.Cmd {
 		"-crf", "24",
 		outputFile,
 	)
+}
+
+func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
+	var out []byte
+	buf := make([]byte, 1024, 1024)
+	for {
+		n, err := r.Read(buf[:])
+		if n > 0 {
+			d := buf[:n]
+			out = append(out, d...)
+			_, err := w.Write(d)
+			if err != nil {
+				return out, err
+			}
+		}
+		if err != nil {
+			// Read returns io.EOF at the end of file, which is not an error for us
+			if err == io.EOF {
+				err = nil
+			}
+			return out, err
+		}
+	}
 }
