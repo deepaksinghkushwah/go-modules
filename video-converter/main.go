@@ -15,7 +15,7 @@ func main() {
 	currentPath, _ := os.Getwd()
 	ps := string(os.PathSeparator)
 	cmd := newCmd(currentPath+ps+mainFile, currentPath+ps+outputFile)
-	//fmt.Println(cmd.String())
+	//go infmt.Println(cmd.String())
 	if err := cmd.Run(); err != nil {
 		log.Fatalln(err)
 	}
