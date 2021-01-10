@@ -1,24 +1,56 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
+
+	"github.com/gammazero/workerpool"
 )
 
-func main() {
-	var mainFile, outputFile string
-	flag.StringVar(&mainFile, "main", "movie.mp4", "The main movie file name which need to be converted")
-	flag.StringVar(&outputFile, "output", "output.mp4", "Output video file name")
-	flag.Parse()
-	currentPath, _ := os.Getwd()
-	ps := string(os.PathSeparator)
-	cmd := newCmd(currentPath+ps+mainFile, currentPath+ps+outputFile)
-	//go infmt.Println(cmd.String())
-	if err := cmd.Run(); err != nil {
-		log.Fatalln(err)
+func visit(files *[]string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		if filepath.Ext(path) == ".mp4" || filepath.Ext(path) == ".mpeg" || filepath.Ext(path) == ".mov" {
+			*files = append(*files, path)
+		}
+
+		return nil
 	}
+}
+
+func main() {
+
+	root, _ := os.Getwd()
+	var files []string
+	err := filepath.Walk(root, visit(&files))
+	if err != nil {
+		panic(err)
+	}
+
+	wp := workerpool.New(len(files))
+	for _, file := range files {
+		source := file
+		dest := strings.TrimSuffix(source, filepath.Ext(source)) + "-out.mp4"
+		cmd := newCmd(source, dest)
+		fmt.Println(cmd.String())
+		wp.Submit(func() {
+			if err := cmd.Run(); err != nil {
+				log.Fatalln(err)
+			}
+		})
+
+	}
+	wp.StopWait()
 }
 
 func newCmd(mainFile, outputFile string) *exec.Cmd {
