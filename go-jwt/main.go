@@ -154,6 +154,10 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -162,11 +166,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if !tkn.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	// (END) The code up-till this point is the same as the first part of the `Welcome` route
+	// (END) The code uptil this point is the same as the first part of the `Welcome` route
 
 	// We ensure that a new token is not issued until enough time has elapsed
 	// In this case, a new token will only be issued if the old token is within
@@ -186,9 +186,9 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the new token as the users `token` cookie
+	// Set the new token as the users `session_token` cookie
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
+		Name:    "session_token",
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
