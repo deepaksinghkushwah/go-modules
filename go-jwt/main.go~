@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -44,15 +43,11 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-type JWTToken struct {
-	Token string `json:"token"`
-}
-
 func main() {
 	// "Signin" and "Welcome" are the handlers that we will implement
 	router.POST("/signin", Signin)
-	router.POST("/welcome", Welcome)
-	router.POST("/refresh", Refresh)
+	router.GET("/welcome", Welcome)
+	router.GET("/refresh", Refresh)
 
 	// start the server on port 8000
 	log.Fatal(router.Run(":8080"))
@@ -111,13 +106,46 @@ func Signin(c *gin.Context) {
 
 func Welcome(c *gin.Context) {
 	// We can obtain the session token from the requests cookies, which come with every request
-	claims, err := checkValidToken(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
+	tknStr := c.Query("token")
+	if tknStr == "" {
+		// For any other type of error, return a bad request status
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "You must supply token",
 		})
 		return
 	}
+
+	// Get the JWT string from the cookie
+
+	// Initialize a new instance of `Claims`
+	claims := &Claims{}
+
+	// Parse the JWT string and store the result in `claims`.
+	// Note that we are passing the key in this method as well. This method will return an error
+	// if the token is invalid (if it has expired according to the expiry time we set on sign in),
+	// or if the signature does not match
+	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized Access",
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Bad Request",
+		})
+		return
+	}
+	if !tkn.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized Access",
+		})
+		return
+	}
+
 	// Finally, return the welcome message to the user, along with their
 	// username given in the token
 	c.JSON(http.StatusOK, gin.H{
@@ -126,11 +154,35 @@ func Welcome(c *gin.Context) {
 }
 
 func Refresh(c *gin.Context) {
+	// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
+	tknStr := c.Query("token")
+	if tknStr == "" {
 
-	claims, err := checkValidToken(c)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Bad Request",
+		})
+		return
+	}
+
+	claims := &Claims{}
+	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if !tkn.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized Access",
+		})
+		return
+	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
+		if err == jwt.ErrSignatureInvalid {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized Access",
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Bad Request",
 		})
 		return
 	}
@@ -139,11 +191,9 @@ func Refresh(c *gin.Context) {
 	// We ensure that a new token is not issued until enough time has elapsed
 	// In this case, a new token will only be issued if the old token is within
 	// 30 seconds of expiry. Otherwise, return a bad request status
-	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 2*time.Hour {
-		t := time.Unix(claims.ExpiresAt, 0)
-		ut := t.Format(time.RFC3339)
+	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Your token is new for session, wait for " + (ut) + " to renew token",
+			"error": "Bad Request",
 		})
 		return
 	}
@@ -166,41 +216,6 @@ func Refresh(c *gin.Context) {
 		"Expires": expirationTime,
 	})
 
-}
-
-func checkValidToken(c *gin.Context) (*Claims, error) {
-	var jwrtToken JWTToken
-	if err := c.ShouldBindJSON(&jwrtToken); err != nil {
-		return nil, customError("Token must be supplied")
-	}
-	tknStr := jwrtToken.Token
-
-	// Get the JWT string from the cookie
-
-	// Initialize a new instance of `Claims`
-	claims := &Claims{}
-
-	// Parse the JWT string and store the result in `claims`.
-	// Note that we are passing the key in this method as well. This method will return an error
-	// if the token is invalid (if it has expired according to the expiry time we set on sign in),
-	// or if the signature does not match
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return nil, customError("Invalid token signature")
-		}
-		return nil, customError("Invalid token signature")
-	}
-	if !tkn.Valid {
-		return nil, customError("Unauthorized Access, token not valid")
-	}
-	return claims, nil
-}
-
-func customError(message string) error {
-	return errors.New(message)
 }
 
 func getUserFromDB(expUsername, expPassword string) (*User, error) {
