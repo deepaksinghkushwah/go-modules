@@ -17,6 +17,7 @@ import (
 
 var jwtKey = []byte("my_secret_key")
 
+//User struct to define user
 type User struct {
 	ID        int
 	Username  string
@@ -31,19 +32,20 @@ var (
 	router = gin.Default()
 )
 
-// Create a struct to read the username and password from the request body
+//Credentials Create a struct to read the username and password from the request body
 type Credentials struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
 }
 
-// Create a struct that will be encoded to a JWT.
+//Claims Create a struct that will be encoded to a JWT.
 // We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
+//JWTToken to bind token in request body
 type JWTToken struct {
 	Token string `json:"token"`
 }
@@ -58,7 +60,7 @@ func main() {
 	log.Fatal(router.Run(":8080"))
 }
 
-// Create the Signin handler
+//Signin Create the Signin handler
 func Signin(c *gin.Context) {
 	var creds Credentials
 	// Get the JSON body and decode into credentials
@@ -109,9 +111,10 @@ func Signin(c *gin.Context) {
 	})
 }
 
+//Welcome create welcome handler function
 func Welcome(c *gin.Context) {
 	// We can obtain the session token from the requests cookies, which come with every request
-	claims, err := checkValidToken(c)
+	claims, err := CheckValidToken(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
@@ -125,9 +128,10 @@ func Welcome(c *gin.Context) {
 	})
 }
 
+//Refresh to refresh your jwt token
 func Refresh(c *gin.Context) {
 
-	claims, err := checkValidToken(c)
+	claims, err := CheckValidToken(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
@@ -168,7 +172,8 @@ func Refresh(c *gin.Context) {
 
 }
 
-func checkValidToken(c *gin.Context) (*Claims, error) {
+//CheckValidToken to check the token validation
+func CheckValidToken(c *gin.Context) (*Claims, error) {
 	var jwrtToken JWTToken
 	if err := c.ShouldBindJSON(&jwrtToken); err != nil {
 		return nil, customError("Token must be supplied")
